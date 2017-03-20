@@ -78,7 +78,3 @@ class SPRTBinomial(SPRT):
     def seqTest(self):
 
         self.cum_values = np.cumsum(self.values)
-
-
-a = SPRTBinomial(alpha = 0.05, beta = 0.2, h0 = 0.1, h1 = 0.3, values = [1, 1, 0, 1, 0, 1])
-a.plot_boundary()  
