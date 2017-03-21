@@ -1,12 +1,13 @@
 sprt --- Wald's Sequential Probability Ratio Test
 =========================
 
-Data Distribution
+Class
 -----------------
 
-..*Bernoulli
-..*Normal
-
+| Distribution  | Python Constructor | 
+| ------------- |:-------------:| 
+| Binomial      | SPRTBinomial  | 
+| Normal        | SPRTNormal    | 
 
 Example
 -----------
