@@ -26,3 +26,11 @@ Obtain the boundary plot
 # Show plot
 test.plot()
 ```
+
+Docs
+------------
+
+
+Reference
+------------
+Wald, Abraham (June 1945). "Sequential Tests of Statistical Hypotheses". *Annals of Mathematical Statistics*. **16** (2): 117–186.
