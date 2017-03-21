@@ -38,6 +38,8 @@ class SPRT:
         self.lowerCritical = np.log(self.beta/(1 - self.alpha))
         self.num_observation = len(values)
         self._seq_observation = np.array(range(1, self.num_observation + 1))
+        self._x = np.array(range(0, self.num_observation + 2))
+        self._yl = self._yu = np.ones(self.num_observation + 2)
         self.decision = None
         # Check the arguments
         self._checkCommonArgs()
@@ -56,21 +58,21 @@ class SPRT:
             sys.exit(1)
 
     # Plot the boundary and points
-    def plot(self, boundaryColor = ["#cc181e", "#2793e8", 	"#559900"],  pointColor = "#3f5d7d", fill = True):
+    def plot(self, boundaryColor = ["#cc181e", "#2793e8", 	"#000000"],  pointColor = "#000000", fill = True):
 
         upperBoundaryColor, lowerBoundaryColor, continueColor = boundaryColor
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.plot(self._seq_observation, self.upperBoundary, color = upperBoundaryColor, linewidth = 1, alpha = 0.95)
-        ax.plot(self._seq_observation, self.lowerBoundary, color = lowerBoundaryColor,  linewidth = 1,  alpha = 0.95)
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(self._x, self._yl, color = lowerBoundaryColor, linewidth = 1, alpha = 0.95)
+        ax.plot(self._x, self._yu, color = upperBoundaryColor,  linewidth = 1,  alpha = 0.95)
         ax.scatter(self._seq_observation, self.cum_values, color = pointColor, zorder = 1000)
         yticks, yticklabels = plt.yticks()
         ymin = yticks[0]
         ymax = yticks[-1]
         if fill:
 
-            ax.fill_between(self._seq_observation, self.lowerBoundary, ymin, color = lowerBoundaryColor, alpha = 0.5)
-            ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
-            ax.fill_between(self._seq_observation, self.lowerBoundary, ymax, color = upperBoundaryColor, alpha = 0.5)
+            ax.fill_between(self._x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
+            # ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
+            ax.fill_between(self._x, self._yu, ymax, color = upperBoundaryColor, alpha = 0.5)
 
         ax.spines["top"].set_visible(False)      
         ax.spines["right"].set_visible(False)      
@@ -90,18 +92,24 @@ class SPRT:
     def plotBoundary(self, boundaryColor = ["#cc181e", "#2793e8", "#559900"], fill = True):
 
         upperBoundaryColor, lowerBoundaryColor, continueColor = boundaryColor
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.plot(self._seq_observation, self.upperBoundary, color="#b14a55", linewidth = 1)
-        ax.plot(self._seq_observation, self.lowerBoundary, color="#fe6b7a", linewidth = 1)
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot(self._x, self._yl, color= lowerBoundaryColor, linewidth = 1)
+        ax.plot(self._x, self._yu, color= upperBoundaryColor, linewidth = 1)
+        yticks, yticklabels = plt.yticks()
+        ymin = yticks[0]
+        ymax = yticks[-1]
         if fill:
 
-            ax.fill_between()
+            ax.fill_between(self.x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
+            # ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
+            ax.fill_between(self._x, self._yu, ymax, color = upperBoundaryColor, alpha = 0.5)
             
         ax.spines["top"].set_visible(False)      
         ax.spines["right"].set_visible(False)      
         ax.get_xaxis().tick_bottom()    
         ax.get_yaxis().tick_left()
         plt.xlim(1, self.num_observation)
+        plt.ylim(ymin, ymax)
         plt.xticks(self._seq_observation)
         plt.xlabel("Observations")
         plt.ylabel("Cumulative Sum")
@@ -113,9 +121,10 @@ class SPRT:
         print("Decision:\t" + self.decision + "\n")
         if PANDAS_INSTALLED == True:
 
-            output_dict = {'values': self.cum_values, 'lower': self.lowerBoundary, 'upper': self.upperBoundary, 'n': self._seq_observation}
-            output_df = pd.DataFrame(output_dict, columns = ['values', 'lower', 'upper', 'n'])
-            print(output_df)
+            output_dict = {'values': self.cum_values, 'lower': self.lowerBoundary, 'upper': self.upperBoundary}
+            output_df = pd.DataFrame(output_dict, columns = ['values', 'lower', 'upper'], index = self._seq_observation)
+            output_df.index.name = "n"
+            print(output_df.round(3))
 
         else:
 
@@ -164,9 +173,11 @@ class SPRTBinomial(SPRT):
 
         self.denom = (np.log(self.h1/(1 - self.h1)) - np.log(self.h0/(1 - self.h0)))
         self.slope = (np.log(1 - self.h0) - np.log(1 - self.h1))/ self.denom
-        self.upperIntercept, self.lowerIntercept = np.array([self.upperCritical, self.lowerCritical]) / self.denom
-        self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
+        self.lowerIntercept, self.upperIntercept = np.array([self.lowerCritical, self.upperCritical]) / self.denom
         self.lowerBoundary = self._seq_observation * self.slope + self.lowerIntercept
+        self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
+        self._yl = self._x * self.slope + self.lowerIntercept
+        self._yu = self._x * self.slope + self.upperIntercept
 
     # Check arguments
     def _checkOtherArgs(self):
@@ -192,9 +203,11 @@ class SPRTNormal(SPRT):
     def calBoundary(self):
 
         self.slope = (self.h1 + self.h0)/2
-        self.upperIntercept, self.lowerIntercept = np.array([self.upperCritical, self.lowerCritical]) * self.variance / (self.h1 - self.h0)
-        self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
+        self.lowerIntercept, self.upperIntercept= np.array([self.lowerCritical, self.upperCritical]) * self.variance / (self.h1 - self.h0)
         self.lowerBoundary = self._seq_observation * self.slope + self.lowerIntercept
+        self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
+        self._yl = self._x * self.slope + self.lowerIntercept
+        self._yu = self._x * self.slope + self.upperIntercept
 
     # Check arguments
     def _checkOtherArgs(self):
