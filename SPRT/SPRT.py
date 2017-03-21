@@ -120,4 +120,4 @@ class SPRTBinomial(SPRT):
 
             self.decision = "Continue"
 
-        return self.decision
+        print("Decision:\t" + self.decision)
