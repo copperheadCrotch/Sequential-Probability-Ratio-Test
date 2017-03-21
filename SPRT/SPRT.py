@@ -107,6 +107,7 @@ class SPRTBinomial(SPRT):
     def seqTest(self):
 
         self.cum_values = np.cumsum(self.values)
+<<<<<<< HEAD:SPRT/SPRT.py
         self.test_statistic = self.cum_values[self.num_observation - 1]
         if self.test_statistic > self.upperBoundary[self.num_observation - 1]:
 
@@ -121,3 +122,5 @@ class SPRTBinomial(SPRT):
             self.decision = "Continue"
 
         return self.decision
+=======
+>>>>>>> origin/master:SPRT.py
