@@ -1,6 +1,5 @@
 import abc
 import matplotlib.pyplot as plt
-import numbers
 import numpy as np
 import sys
 
@@ -216,4 +215,29 @@ class SPRTNormal(SPRT):
         if self.variance <= 0:
 
             sys.stderr.write("Variance of normal distribution is positive!")
+            sys.exit(1)
+
+
+# Poisson Endpoint
+class SPRTPoisson(SPRT):
+
+    """Run sequential probability ratio test (SPRT) for normal endpoints"""
+    # Calculate boundary for normal outcome
+    def calBoundary(self):
+
+        self.denom = np.log(self.h1) - np.log(self.h0)
+        self.slope = (self.h1 - self.h0) / self.denom
+        self.lowerIntercept, self.upperIntercept= np.array([self.lowerCritical, self.upperCritical]) / self.denom
+        self.lowerBoundary = self._seq_observation * self.slope + self.lowerIntercept
+        self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
+        self._yl = self._x * self.slope + self.lowerIntercept
+        self._yu = self._x * self.slope + self.upperIntercept
+
+    # Check arguments
+    def _checkOtherArgs(self):
+
+        # Check h0 and h1
+        if not all(i >  0 or i in [self.h0, self.h1]):
+
+            sys.stderr.write("Null and alternative values are positive!")
             sys.exit(1)
