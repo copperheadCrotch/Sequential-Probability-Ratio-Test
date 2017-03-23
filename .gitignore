@@ -51,3 +51,4 @@ Readme.md
 /dist/*
 /sprt.egg-info/*
 *.pyc
+/.ipynb_checkpoints/*
