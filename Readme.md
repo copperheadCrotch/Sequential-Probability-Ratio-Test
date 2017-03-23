@@ -1,5 +1,11 @@
 sprt --- Wald's Sequential Probability Ratio Test
 =========================
+Installation
+-----------------
+
+```
+pip install sprt
+```
 
 Class
 -----------------
@@ -7,7 +13,8 @@ Class
 | Distribution  | Python Constructor | 
 | ------------- |:-------------:| 
 | Binomial      | SPRTBinomial  | 
-| Normal ? ? ?  | SPRTNormal    | 
+| Normal        | SPRTNormal    | 
+| Poisson       | SPRTPoisson    | 
 
 Example
 -----------
@@ -33,4 +40,4 @@ Docs
 
 Reference
 ------------
-Wald, Abraham (June 1945). "Sequential Tests of Statistical Hypotheses". *Annals of Mathematical Statistics*. **16** (2): 117¨C186.
+Wald, Abraham (June 1945). "Sequential Tests of Statistical Hypotheses". *Annals of Mathematical Statistics*. **16** (2): 117â€“186.
