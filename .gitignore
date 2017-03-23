@@ -50,3 +50,4 @@ Readme.md
 /build/*
 /dist/*
 /sprt.egg-info/*
+*.pyc
