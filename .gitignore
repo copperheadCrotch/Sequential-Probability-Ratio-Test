@@ -46,3 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 Readme.md
+
+/build/*
+/dist/*
+/sprt.egg-info/*

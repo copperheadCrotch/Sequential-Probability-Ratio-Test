@@ -1,18 +1,9 @@
 import abc
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
+import pandas as pd
 import sys
-
-# Check if pandas is installed
-try:
-
-    import pandas as pd
-    PANDAS_INSTALLED = True
-
-except:
-
-    PANDAS_INSTALLED = False
-    
 
 # SPRT test
 class SPRT:
@@ -57,13 +48,13 @@ class SPRT:
             sys.exit(1)
 
     # Plot the boundary and points
-    def plot(self, boundaryColor = ["#cc181e", "#2793e8", 	"#000000"],  pointColor = "#000000", fill = True):
+    def plot(self, boundaryColor = ["#00aedb", "#d41243",  "#000000"],  pointColor = "#000000", fill = True):
 
-        upperBoundaryColor, lowerBoundaryColor, continueColor = boundaryColor
+        lowerBoundaryColor, upperBoundaryColor, continueColor = boundaryColor
         fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(self._x, self._yl, color = lowerBoundaryColor, linewidth = 1, alpha = 0.95)
-        ax.plot(self._x, self._yu, color = upperBoundaryColor,  linewidth = 1,  alpha = 0.95)
-        ax.scatter(self._seq_observation, self.cum_values, color = pointColor, zorder = 1000)
+        lower_line, = ax.plot(self._x, self._yl, color = lowerBoundaryColor, linewidth = 1, alpha = 0.95)
+        upper_line, = ax.plot(self._x, self._yu, color = upperBoundaryColor,  linewidth = 1,  alpha = 0.95)
+        ax.scatter(self._seq_observation, self.cum_values, color = pointColor, zorder = 1000, clip_on=False)
         yticks, yticklabels = plt.yticks()
         ymin = yticks[0]
         ymax = yticks[-1]
@@ -77,29 +68,30 @@ class SPRT:
         ax.spines["right"].set_visible(False)      
         ax.get_xaxis().tick_bottom()    
         ax.get_yaxis().tick_left()
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer = True))
         xticks, xticklabels = plt.xticks()
         xmin = 0.95
         xmax = self.num_observation + 0.05 
         plt.xlim(xmin, xmax)
         plt.ylim(ymin, ymax)
-        plt.xticks(self._seq_observation)
         plt.xlabel("Observations")
         plt.ylabel("Cumulative Sum")
+        plt.legend(handles = [upper_line, lower_line], labels = ["Reject Null", "Accept Null"], fontsize = 10, loc = 2)
         plt.show()
 
     # Plot only the boundary values
-    def plotBoundary(self, boundaryColor = ["#cc181e", "#2793e8", "#559900"], fill = True):
+    def plotBoundary(self, boundaryColor = ["#00aedb", "#d41243"],  fill = True):
 
-        upperBoundaryColor, lowerBoundaryColor, continueColor = boundaryColor
+        lowerBoundaryColor, upperBoundaryColor = boundaryColor
         fig, ax = plt.subplots(figsize=(8, 6))
-        ax.plot(self._x, self._yl, color= lowerBoundaryColor, linewidth = 1)
-        ax.plot(self._x, self._yu, color= upperBoundaryColor, linewidth = 1)
+        lower_line, = ax.plot(self._x, self._yl, color= lowerBoundaryColor, linewidth = 1)
+        upper_line, = ax.plot(self._x, self._yu, color= upperBoundaryColor, linewidth = 1)
         yticks, yticklabels = plt.yticks()
         ymin = yticks[0]
         ymax = yticks[-1]
         if fill:
 
-            ax.fill_between(self.x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
+            ax.fill_between(self._x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
             # ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
             ax.fill_between(self._x, self._yu, ymax, color = upperBoundaryColor, alpha = 0.5)
             
@@ -107,32 +99,23 @@ class SPRT:
         ax.spines["right"].set_visible(False)      
         ax.get_xaxis().tick_bottom()    
         ax.get_yaxis().tick_left()
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer = True))
         plt.xlim(1, self.num_observation)
         plt.ylim(ymin, ymax)
-        plt.xticks(self._seq_observation)
         plt.xlabel("Observations")
         plt.ylabel("Cumulative Sum")
+        plt.legend(handles = [upper_line, lower_line], labels = ["Reject Null", "Accept Null"], fontsize = 10, loc = 2)
         plt.show()
 
-    # Print test result
-    def getResult(self):
+    # Get test result
+    def getResult(self, nobs = 5, start = "end"):
 
         print("Decision:\t" + self.decision + "\n")
-        if PANDAS_INSTALLED == True:
-
-            output_dict = {'values': self.cum_values, 'lower': self.lowerBoundary, 'upper': self.upperBoundary}
-            output_df = pd.DataFrame(output_dict, columns = ['values', 'lower', 'upper'], index = self._seq_observation)
-            output_df.index.name = "n"
-            print(output_df.round(3))
-
-        else:
-
-            print('values\tlower\tupper\tn\n')
-            for i in range(0, self.num_observation - 1):
-
-                print('%.3f\t%.3f\t%.3f\t%d\n'%(self.cum_values[i], self.lowerBoundary[i], self.upperBoundary[i], self._seq_observation[i]))
-
-    
+        output_dict = {'values': self.cum_values, 'lower': self.lowerBoundary, 'upper': self.upperBoundary}
+        output_df = pd.DataFrame(output_dict, columns = ['values', 'lower', 'upper'], index = self._seq_observation)
+        output_df.index.name = "n"
+        print(output_df.round(3).iloc[-nobs:])
+        
     # Sequential test
     def seqTest(self):
 
@@ -149,7 +132,8 @@ class SPRT:
 
             self.decision = "Continue"
 
-        self.printResult()
+        header = 10 if self.num_observation > 10 else self.num_observation
+        self.getResult(nobs = header)
         
     # Abstract method, calculate the boundary by time
     @abc.abstractmethod
@@ -159,7 +143,7 @@ class SPRT:
 
     # Abstarct method, function to check other input arguments
     @abc.abstractmethod
-    def _checkOtherArgs(self):
+    def __checkOtherArgs(self):
 
         return 
         

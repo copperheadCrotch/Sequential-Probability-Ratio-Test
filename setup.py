@@ -4,18 +4,38 @@ import numpy
 
 here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+install_requires = []
+
+try:
+
+    import matplotlib
+
+except ImportError:
+
+    install_requires.append('matplotlib')
+    
+try:
+
+    import numpy
+
+except ImportError:
+
+    install_requires.append('numpy')
+
+try:
+
+    import pandas
+
+except ImportError:
+
+    install_requires.append('append')
 
 setup(
-    
     include_dirs=[numpy.get_include()],
     name='sprt',
     version='0.0.1',
-    description='https://github.com/ContaTP/Sequentially-Probability-Ratio-Test',
-    long_description=long_description,
-    url='https://github.com/ContaTP/Sequentially-Probability-Ratio-Test',
+    description='Python package to do sequential probability ratio test',
+    url='https://github.com/ContaTP/Sequential-Probability-Ratio-Test',
     author='Zhenning Yu',
     author_email='yuzhenning.bio@gmail.com',
     zip_safe = False,
@@ -37,11 +57,7 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX :: Linux',
     ],
-    keywords='sequential analysis, sprt, likelihood',
-    packages=find_packages(),
-    package_data={'sprt': ['../README.md']},
-    install_requires=[
-        'numpy',
-        'matplotlib'
-    ],
+    keywords='sequential analysis, sprt, likelihood, likelihood ratio, Wald',
+    packages=find_packages(exclude=('tests', 'docs')),
+    install_requires= install_requires
 )
