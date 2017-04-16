@@ -25,7 +25,7 @@ import sprt as sprt
 import numpy as np
 
 test = sprt.SPRTNormal(alpha = 0.05, beta = 0.2, h0 = 0, h1 = 1, 
-values = np.random.normal(10, 0, 1), 
+values = np.random.normal(0, 1, 10), 
 variance = 1)
 ```
 Obtain the boundary plot
