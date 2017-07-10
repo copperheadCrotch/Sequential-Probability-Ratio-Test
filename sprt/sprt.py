@@ -163,7 +163,7 @@ class SPRTBinomial(SPRT):
         self._yu = self._x * self.slope + self.upperIntercept
 
     # Check arguments
-    def __checkOtherArgs(self):
+    def _SPRT__checkOtherArgs(self):
 
         # Check h0 and h1
         if not all(0 < i < 1 for i in [self.h0, self.h1]):
@@ -193,7 +193,7 @@ class SPRTNormal(SPRT):
         self._yu = self._x * self.slope + self.upperIntercept
 
     # Check arguments
-    def __checkOtherArgs(self):
+    def _SPRT__checkOtherArgs(self):
 
         # Check variance
         if self.variance <= 0:
@@ -218,7 +218,7 @@ class SPRTPoisson(SPRT):
         self._yu = self._x * self.slope + self.upperIntercept
 
     # Check arguments
-    def __checkOtherArgs(self):
+    def _SPRT__checkOtherArgs(self):
 
         # Check h0 and h1
         if not all(i > 0 or i in [self.h0, self.h1]):
