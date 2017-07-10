@@ -13,7 +13,7 @@ try:
 except ImportError:
 
     install_requires.append('matplotlib')
-    
+
 try:
 
     import numpy
@@ -38,7 +38,7 @@ setup(
     url='https://github.com/ContaTP/Sequential-Probability-Ratio-Test',
     author='Zhenning Yu',
     author_email='yuzhenning.bio@gmail.com',
-    zip_safe = False,
+    zip_safe=False,
     license='GPLv3',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -59,5 +59,5 @@ setup(
     ],
     keywords='sequential analysis, sprt, likelihood, likelihood ratio, Wald',
     packages=find_packages(exclude=('tests', 'docs')),
-    install_requires= install_requires
+    install_requires=install_requires
 )

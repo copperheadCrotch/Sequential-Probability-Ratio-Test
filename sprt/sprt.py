@@ -5,15 +5,16 @@ import numpy as np
 import pandas as pd
 import sys
 
+
 # SPRT test
 class SPRT:
 
     __metaclass__ = abc.ABCMeta
-    
+  
     """Run sequential probability ratio test (SPRT) for bindary/normal endpoints"""
     # Init function
-    def __init__(self, alpha = 0.05, beta = 0.2,
-                 h0 = 0, h1 = 1, values = [], variance = 0):
+    def __init__(self, alpha=0.05, beta=0.2,
+                 h0=0, h1=1, values=[], variance=0):
 
         # Input arguments
         self.alpha = alpha
@@ -42,80 +43,78 @@ class SPRT:
     # Check common arguments in the fuction
     def __checkCommonArgs(self):
 
-        if not all(0 < i <1 for i in [self.alpha, self.beta]):
+        if not all(0 < i < 1 for i in [self.alpha, self.beta]):
 
             sys.stderr.write("Type I error rate and type II error rate are between 0 and 1!")
             sys.exit(1)
 
     # Plot the boundary and points
-    def plot(self, boundaryColor = ["#00aedb", "#d41243",  "#000000"],  pointColor = "#000000", fill = True):
+    def plot(self, boundaryColor=["#00aedb", "#d41243",  "#000000"],  pointColor="#000000", fill=True):
 
         lowerBoundaryColor, upperBoundaryColor, continueColor = boundaryColor
         fig, ax = plt.subplots(figsize=(8, 6))
-        lower_line, = ax.plot(self._x, self._yl, color = lowerBoundaryColor, linewidth = 1, alpha = 0.95)
-        upper_line, = ax.plot(self._x, self._yu, color = upperBoundaryColor,  linewidth = 1,  alpha = 0.95)
-        ax.scatter(self._seq_observation, self.cum_values, color = pointColor, zorder = 1000, clip_on=False)
+        lower_line, = ax.plot(self._x, self._yl, color=lowerBoundaryColor, linewidth=1, alpha=0.95)
+        upper_line, = ax.plot(self._x, self._yu, color=upperBoundaryColor,  linewidth=1,  alpha=0.95)
+        ax.scatter(self._seq_observation, self.cum_values, color=pointColor, zorder=1000, clip_on=False)
         yticks, yticklabels = plt.yticks()
         ymin = yticks[0]
         ymax = yticks[-1]
         if fill:
 
-            ax.fill_between(self._x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
-            # ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
-            ax.fill_between(self._x, self._yu, ymax, color = upperBoundaryColor, alpha = 0.5)
+            ax.fill_between(self._x, self._yl, ymin, color=lowerBoundaryColor, alpha=0.5)
+            ax.fill_between(self._x, self._yu, ymax, color=upperBoundaryColor, alpha=0.5)
 
-        ax.spines["top"].set_visible(False)      
-        ax.spines["right"].set_visible(False)      
-        ax.get_xaxis().tick_bottom()    
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()
-        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer = True))
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         xticks, xticklabels = plt.xticks()
         xmin = 0.95
-        xmax = self.num_observation + 0.05 
+        xmax = self.num_observation + 0.05
         plt.xlim(xmin, xmax)
         plt.ylim(ymin, ymax)
         plt.xlabel("Observations")
         plt.ylabel("Cumulative Sum")
-        plt.legend(handles = [upper_line, lower_line], labels = ["Reject Null", "Accept Null"], fontsize = 10, loc = 2)
+        plt.legend(handles=[upper_line, lower_line], labels=["Reject Null", "Accept Null"], fontsize=10, loc=2)
         plt.show()
 
     # Plot only the boundary values
-    def plotBoundary(self, boundaryColor = ["#00aedb", "#d41243"],  fill = True):
+    def plotBoundary(self, boundaryColor=["#00aedb", "#d41243"],  fill=True):
 
         lowerBoundaryColor, upperBoundaryColor = boundaryColor
         fig, ax = plt.subplots(figsize=(8, 6))
-        lower_line, = ax.plot(self._x, self._yl, color= lowerBoundaryColor, linewidth = 1)
-        upper_line, = ax.plot(self._x, self._yu, color= upperBoundaryColor, linewidth = 1)
+        lower_line, = ax.plot(self._x, self._yl, color=lowerBoundaryColor, linewidth=1)
+        upper_line, = ax.plot(self._x, self._yu, color=upperBoundaryColor, linewidth=1)
         yticks, yticklabels = plt.yticks()
         ymin = yticks[0]
         ymax = yticks[-1]
         if fill:
 
-            ax.fill_between(self._x, self._yl, ymin, color = lowerBoundaryColor, alpha = 0.5)
-            # ax.fill_between(self._seq_observation, self.lowerBoundary, self.upperBoundary, color = continueColor, alpha = 0.5)
-            ax.fill_between(self._x, self._yu, ymax, color = upperBoundaryColor, alpha = 0.5)
-            
-        ax.spines["top"].set_visible(False)      
-        ax.spines["right"].set_visible(False)      
-        ax.get_xaxis().tick_bottom()    
+            ax.fill_between(self._x, self._yl, ymin, color=lowerBoundaryColor, alpha=0.5)
+            ax.fill_between(self._x, self._yu, ymax, color=upperBoundaryColor, alpha=0.5)
+
+        ax.spines["top"].set_visible(False) 
+        ax.spines["right"].set_visible(False)
+        ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()
-        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer = True))
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         plt.xlim(1, self.num_observation)
         plt.ylim(ymin, ymax)
         plt.xlabel("Observations")
         plt.ylabel("Cumulative Sum")
-        plt.legend(handles = [upper_line, lower_line], labels = ["Reject Null", "Accept Null"], fontsize = 10, loc = 2)
+        plt.legend(handles = [upper_line, lower_line], labels=["Reject Null", "Accept Null"], fontsize = 10, loc = 2)
         plt.show()
 
     # Get test result
-    def getResult(self, nobs = 5, start = "end"):
+    def getResult(self, nobs=5, start="end"):
 
         print("Decision:\t" + self.decision + "\n")
         output_dict = {'values': self.cum_values, 'lower': self.lowerBoundary, 'upper': self.upperBoundary}
-        output_df = pd.DataFrame(output_dict, columns = ['values', 'lower', 'upper'], index = self._seq_observation)
+        output_df = pd.DataFrame(output_dict, columns=['values', 'lower', 'upper'], index=self._seq_observation)
         output_df.index.name = "n"
         print(output_df.round(3).iloc[-nobs:])
-        
+
     # Sequential test
     def seqTest(self):
 
@@ -133,8 +132,8 @@ class SPRT:
             self.decision = "Continue"
 
         header = 10 if self.num_observation > 10 else self.num_observation
-        self.getResult(nobs = header)
-        
+        self.getResult(nobs=header)
+
     # Abstract method, calculate the boundary by time
     @abc.abstractmethod
     def calBoundary(self):
@@ -145,8 +144,9 @@ class SPRT:
     @abc.abstractmethod
     def __checkOtherArgs(self):
 
-        return 
-        
+        return
+
+
 # Binary Endpoint
 class SPRTBinomial(SPRT):
 
@@ -155,7 +155,7 @@ class SPRTBinomial(SPRT):
     def calBoundary(self):
 
         self.denom = (np.log(self.h1/(1 - self.h1)) - np.log(self.h0/(1 - self.h0)))
-        self.slope = (np.log(1 - self.h0) - np.log(1 - self.h1))/ self.denom
+        self.slope = (np.log(1 - self.h0) - np.log(1 - self.h1)) / self.denom
         self.lowerIntercept, self.upperIntercept = np.array([self.lowerCritical, self.upperCritical]) / self.denom
         self.lowerBoundary = self._seq_observation * self.slope + self.lowerIntercept
         self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
@@ -166,7 +166,7 @@ class SPRTBinomial(SPRT):
     def __checkOtherArgs(self):
 
         # Check h0 and h1
-        if not all(0 < i <1 for i in [self.h0, self.h1]):
+        if not all(0 < i < 1 for i in [self.h0, self.h1]):
 
             sys.stderr.write("Null and alternative values are between 0 and 1!")
             sys.exit(1)
@@ -186,7 +186,7 @@ class SPRTNormal(SPRT):
     def calBoundary(self):
 
         self.slope = (self.h1 + self.h0)/2
-        self.lowerIntercept, self.upperIntercept= np.array([self.lowerCritical, self.upperCritical]) * self.variance / (self.h1 - self.h0)
+        self.lowerIntercept, self.upperIntercept = np.array([self.lowerCritical, self.upperCritical]) * self.variance / (self.h1 - self.h0)
         self.lowerBoundary = self._seq_observation * self.slope + self.lowerIntercept
         self.upperBoundary = self._seq_observation * self.slope + self.upperIntercept
         self._yl = self._x * self.slope + self.lowerIntercept
@@ -221,7 +221,7 @@ class SPRTPoisson(SPRT):
     def __checkOtherArgs(self):
 
         # Check h0 and h1
-        if not all(i >  0 or i in [self.h0, self.h1]):
+        if not all(i > 0 or i in [self.h0, self.h1]):
 
             sys.stderr.write("Null and alternative values are positive!")
             sys.exit(1)
