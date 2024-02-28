@@ -28,7 +28,7 @@ try:
 
 except ImportError:
 
-    install_requires.append('append')
+    install_requires.append('pandas')
 
 setup(
     include_dirs=[numpy.get_include()],
